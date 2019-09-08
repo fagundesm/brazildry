@@ -1,0 +1,494 @@
+# 1 Are nurse functional atributes important to explain facilitation capabilities? Which ones?
+#Usando o método do crawley pra ficar como na segunda pergunta
+#Quando eu testo o p value usando o update do crawley, os valores retornados soã os mesmos do que pedir summary no modelo cheio. 
+#TUDO SERÁ FEITO À MAO, PASSO POR PASSO ATÉ O MODELO TER MENOS VARIAVEIS COM O MAIOR R² 
+
+#os critérios para tirar ou nao as variáveis parecem ser mais filosóficos.. bastante gente disse pra tirar primeiro as interações não significativas.. inclusive Mr crawley pág 328(?)
+library(MuMIn)
+library(lme4)
+library(lmerTest)
+library(rsq)
+
+wmknurse <- read.csv("whatmakesnurse.csv", h=T)
+
+#tc<-cor(wmknurse[,c(14,23,28,30,31,35,36,37,38)])
+#pairs.panels(tc)
+
+# 1 Are nurse functional atributes important to explain facilitation capabilities? Which ones?
+library(lme4)
+library(dplyr)
+wmk<- read.csv("wmk.csv")
+rt <-wmk%>%
+  select(SLA, das_m, diam_medio_copa, volume_raiz_ocupada, dens_mad, meses_s_fol, CN, dh, d13C)
+
+rt<- scale(rt)
+rtots<- cbind(rt, wmk$plot, wmk$rii)
+rtots<-as.data.frame(rtots)
+colnames(rtots)[colnames(rtots)=="V10"] <- "plot"
+colnames(rtots)[colnames(rtots)=="V11"] <- "rii"
+rtots$plot<- as.factor(rtots$plot)
+
+regtots <-lmer(rii ~ SLA + das_m + diam_medio_copa + volume_raiz_ocupada + dens_mad + meses_s_fol + CN + dh + d13C +  diam_medio_copa:meses_s_fol +  dh:d13C + d13C:volume_raiz_ocupada + d13C:meses_s_fol + volume_raiz_ocupada:meses_s_fol + (1|plot), data=rtots)
+s<-summary(regtots)
+
+reg1s <-  update(regtots, . ~ . -meses_s_fol:d13C )
+anova(regtots,reg1s, test="Chisq")
+summary(reg1s)
+
+reg2s <-  update(reg1s, . ~ . -volume_raiz_ocupada:d13C )
+anova(reg2s,reg1s, test="Chisq")
+summary(reg2s)
+
+reg3s <-  update(reg2s, . ~ . +dh:d13C  )
+anova(reg2s,reg3s, test="Chisq")
+summary(reg3s)
+
+reg4s <-  update(reg3s, . ~ . +diam_medio_copa:meses_s_fol  )
+anova(reg4s,reg3s, test="Chisq")
+summary(reg4s)
+
+reg4s <-  update(reg3s, . ~ . +diam_medio_copa:meses_s_fol  )
+anova(reg4s,reg3s, test="Chisq")
+summary(reg4s)
+
+reg5s <-  update(reg4s, . ~ . -meses_s_fol  )
+anova(reg4s,reg5s, test="Chisq")
+summary(reg5s)
+
+reg6s <-  update(reg5s, . ~ . -SLA   )
+anova(reg6s,reg5s, test="Chisq")
+summary(reg6s)
+
+reg7s <-  update(reg6s, . ~ . -das_m    )
+anova(reg6s,reg7s, test="Chisq")
+summary(reg7s)
+
+reg8s <-  update(reg7s, . ~ . -CN     )
+anova(reg8s,reg7s, test="Chisq")
+summary(reg8s)
+
+reg9s <-  update(reg8s, . ~ . -dens_mad     )
+anova(reg8s,reg9s, test="Chisq")
+summary(reg9s)
+
+reg10s <-  update(reg9s, . ~ . -diam_medio_copa     )
+anova(reg10s,reg9s, test="Chisq")
+summary(reg10s)
+
+reg11s <-  update(reg10s, . ~ . -diam_medio_copa:meses_s_fol )
+anova(reg10s,reg11s, test="Chisq")
+summary(reg11s)
+
+reg12s <-  update(reg11s, . ~ . -dh:d13C )
+anova(reg12s,reg11s, test="Chisq")
+summary(reg12s)
+
+reg13s <-  update(reg12s, . ~ . -volume_raiz_ocupada:meses_s_fol )
+anova(reg12s,reg13s, test="Chisq")
+summary(reg13s)
+
+reg14s <-  update(reg13s, . ~ . -dh )
+anova(reg13s,reg14s, test="Chisq")
+summary(reg14s)
+
+reg15s <-  update(reg14s, . ~ . -d13C )
+anova(reg15s,reg14s, test="Chisq")
+summary(reg15s)
+
+reg16s <-  update(reg15s, . ~ . -volume_raiz_ocupada )
+anova(reg15s,reg16s, test="Chisq")
+summary(reg16s)
+
+#Question2: Como a interação de atributos nurse-target influenciam seus outcomes?
+#traits nurses e rii
+#library(reshape2)
+#wmk<- wmknurse[,c(1,2,14,23,28,30,31,35,36,37,39,40,41,42)]
+#wmk <- melt(wmk, id.vars= c("plot", "spnurse", "dens_mad", "das_m","diam_medio_copa","dh","d13C","CN","SLA","meses_s_fol",
+#                     "volume_raiz_ocupada"), variable.name = "target", value.name = "rii")
+wmk<- read.csv("wmk.csv")
+
+wmk$plot <- as.factor(wmk$plot)
+#wmk <- as.matrix(wmk)
+
+##Análise glmm plot as Fixed factor - Pergunta 2
+
+wmkst <- wmk[,-c(1,2,12)]
+wmkst <- scale(wmkst, center=T, scale=T) # o R sugeriu reescalonar as variáveis preditodas porque elas estão em escalas muito diferentes
+wmkst <- cbind(wmkst, wmk[,c(1,2,12)])
+
+quest2 <- lmer(rii ~ dh:rsprop + meses_s_fol:rsprop +  d13C:rsprop  +  diam_medio_copa:rsprop +  volume_raiz_ocupada:rsprop + CN:rsprop + SLA:rsprop+  dh:sensdrought + meses_s_fol:sensdrought +  d13C:sensdrought  +  diam_medio_copa:sensdrought +  volume_raiz_ocupada:sensdrought+ CN:sensdrought+ SLA:sensdrought+ meses_s_fol:d13C:rsprop + volume_raiz_ocupada:meses_s_fol:rsprop + CN:d13C:rsprop + diam_medio_copa:meses_s_fol:rsprop  + meses_s_fol:d13C:sensdrought  + volume_raiz_ocupada:meses_s_fol:sensdrought  + CN:d13C:sensdrought + diam_medio_copa : meses_s_fol:sensdrought + (1|plot),  data=wmkst) 
+summary(quest2)
+
+q2<- update(quest2,. ~ . -rsprop:d13C:CN )
+anova(quest2, q2, test="Chisq")
+summary(q2)
+
+q3<- update(q2,. ~ . -rsprop:meses_s_fol:d13C )
+anova(q3, q2, test="Chisq")
+summary(q3)
+
+q4<- update(q3,. ~ . -meses_s_fol:d13C:sensdrought )
+anova(q3, q4, test="Chisq")
+summary(q4)
+
+q5<- update(q4,. ~ . -rsprop:meses_s_fol:volume_raiz_ocupada )
+anova(q5, q4, test="Chisq")
+summary(q5)
+
+q6<- update(q5,. ~ . -meses_s_fol:diam_medio_copa:sensdrought )
+anova(q5, q6, test="Chisq")
+summary(q6)
+
+q7<- update(q6,. ~ . -rsprop:meses_s_fol:diam_medio_copa)
+anova(q7, q6, test="Chisq")
+summary(q7)
+
+q8<- update(q7,. ~ . -meses_s_fol:volume_raiz_ocupada:sensdrought)
+anova(q7, q8, test="Chisq")
+summary(q8)
+
+q9<- update(q8,. ~ . -d13C:CN:sensdrought)
+anova(q9, q8, test="Chisq")
+summary(q9)
+
+q10<- update(q9,. ~ . -SLA:sensdrought)
+anova(q9, q10, test="Chisq")
+summary(q10)
+
+q11<- update(q10,. ~ . -rsprop:meses_s_fol)
+anova(q11, q10, test="Chisq")
+summary(q11)
+
+q12<- update(q11,. ~ . -dh:sensdrought)
+anova(q11, q12, test="Chisq")
+summary(q12)
+
+q13<- update(q12,. ~ . -sensdrought:meses_s_fol)
+anova(q13, q12, test="Chisq")
+summary(q13)
+
+q14<- update(q13,. ~ . -rsprop:diam_medio_copa)
+anova(q13, q14, test="Chisq")
+summary(q14)
+
+q15<- update(q14,. ~ . -sensdrought:diam_medio_copa)
+anova(q15, q14, test="Chisq")
+summary(q15)
+
+q16<- update(q15,. ~ . -CN:sensdrought)
+anova(q15, q16, test="Chisq")
+summary(q16)
+
+q17<- update(q16,. ~ . -volume_raiz_ocupada:sensdrought)
+anova(q17, q16, test="Chisq")
+summary(q17)
+r.squaredGLMM(q17)
+
+crPlots(q17)
+
+#partials
+#acho que não tem como fazer no meu modelo, porque uma das variáevis (propriedades das targets) é um 'fator'.
+# https://stats.stackexchange.com/questions/258285/how-to-do-partial-regression-plots-with-linear-mixed-effect-models
+rii ~ dh + rsprop + d13C + volume_raiz_ocupada + CN + SLA 
+#removing the effect of x2 and r on y
+res.y<-residuals(lmer(rii ~ dh + (1|plot),wmkst)) 
+
+#removing the effect of x2 and r on x1
+res.x1 <-residuals(lmer(dh ~ rsprop + (1|plot),wmkst)) 
+
+#partial regression plot to display the pure effect of x1 on y
+plot(res.x1,res.y)
+
+
+
+
+
+
+
+
+
+
+
+#Seleção individual foi ignorada : ) 
+########################################### 
+#Seleção de modelos para A colubrina
+#Crawley pág 328 - 
+#ver como reporta Plant Soil (2015) 388:197–209
+wmkn <- wmknurse[,-c(1,2)]
+wmkn <- scale(wmkn, center=T, scale=T)
+wmknurse <-cbind (wmkn, wmknurse[,c(1,2)])
+
+reg0s <-glm(angico ~ SLA + das_m + diam_medio_copa + volume_raiz_ocupada + dens_mad + meses_s_fol + CN + dh + d13C +  diam_medio_copa:meses_s_fol +  dh:d13C + d13C:volume_raiz_ocupada + d13C:meses_s_fol + volume_raiz_ocupada:meses_s_fol, data=wmknurse)
+summary(reg0s)
+
+reg1s <-  update(reg0s, . ~ . -diam_medio_copa:meses_s_fol )
+summary(reg1s)
+anova(reg0s,reg1s, test="Chisq")
+
+r2<- update(reg1s, . ~ . -volume_raiz_ocupada:d13C)
+anova(reg1s, r2, test="Chisq")
+summary(r2)
+
+r3<- update(r2, . ~ . -dh:d13C)
+anova(r3, r2, test="Chisq")
+summary(r3)
+
+r4<- update(r3, . ~ . -volume_raiz_ocupada:meses_s_fol)
+anova(r3, r4, test="Chisq")
+summary(r4)
+
+r5<- update(r4, . ~ . -meses_s_fol:d13C )
+anova(r4, r5, test="Chisq")
+summary(r5)
+
+r6<- update(r5, . ~ . -dens_mad )
+anova(r6, r5, test="Chisq")
+summary(r6)
+
+r7<- update(r6, . ~ . -meses_s_fol )
+anova(r6, r7, test="Chisq")
+summary(r7)
+
+r8<- update(r7, . ~ . -diam_medio_copa )
+anova(r8, r7, test="Chisq")
+summary(r8)
+
+r9<- update(r8, . ~ . -CN )
+anova(r8, r9, test="Chisq")
+summary(r9)
+
+r10<- update(r9, . ~ . -volume_raiz_ocupada )
+anova(r10, r9, test="Chisq")
+summary(r10)
+
+r11 <- update(r10, . ~ . -das_m )
+anova(r10, r11, test="Chisq")
+summary(r11)
+
+r12 <- update(r11, . ~ . -d13C )
+anova(r12, r11, test="Chisq")
+summary(r12)
+
+anova(r12, test="F")
+plot(r12)
+r.squaredGLMM(r12)
+
+########################################### 
+#Seleção de modelos para AROEIRA M urundeuva
+reg0a <- glm(aroeira ~ SLA + das_m + diam_medio_copa + volume_raiz_ocupada + dens_mad + meses_s_fol + CN + dh + d13C +  diam_medio_copa:meses_s_fol +  dh:d13C +  d13C:meses_s_fol + volume_raiz_ocupada:meses_s_fol, data=wmknurse)
+summary(reg0a)
+
+ra<- update(reg0a, . ~ . -meses_s_fol:d13C)
+anova(reg0a, ra, test="Chisq")
+summary(ra)
+
+rb<- update(ra, . ~ . -dh:d13C )
+anova(ra, rb, test="Chisq")
+summary(rb)
+
+rc<- update(rb, . ~ . -volume_raiz_ocupada:meses_s_fol)
+anova(rb, rc, test="Chisq")
+summary(rc)
+
+rd<- update(rc, . ~ . -diam_medio_copa:meses_s_fol )
+anova(rd, rc, test="Chisq")
+summary(rd)
+
+re<- update(rd, . ~ . -SLA )
+anova(re, rd, test="Chisq")
+summary(re)
+
+rf<- update(re, . ~ . -dh )
+anova(rf, re, test="Chisq")
+summary(rf)
+
+rg<- update(rf, . ~ . -dens_mad )
+anova(rf, rg, test="Chisq")
+summary(rg)
+
+rh<- update(rg, . ~ . -meses_s_fol )
+anova(rg, rh, test="Chisq")
+summary(rh)
+
+ri<- update(rh, . ~ . -das_m )
+anova(ri, rh, test="Chisq")
+summary(ri)
+
+rj<- update(ri, . ~ . -diam_medio_copa )
+anova(ri, rj, test="Chisq")
+summary(rj)
+
+anova(aov(aroeira ~volume_raiz_ocupada + CN + d13C, data=wmknurse))
+
+r.squaredGLMM(rj)
+anova(rj, test="F")
+
+#Seleção de modelos para CATINGUEIRA 
+reg2 <- glm (cating  ~ SLA + das_m + diam_medio_copa + volume_raiz_ocupada + dens_mad + meses_s_fol + CN + dh + d13C + diam_medio_copa:meses_s_fol +  dh:d13C + d13C:volume_raiz_ocupada + d13C:meses_s_fol + volume_raiz_ocupada:meses_s_fol , data=wmknurse)
+summary(reg2)
+
+aa<- update(reg2, . ~ . -diam_medio_copa )
+anova(reg2, aa, test="Chisq")
+summary(aa)
+
+ab<- update(aa, . ~ . -volume_raiz_ocupada:meses_s_fol )
+anova(ab, aa, test="Chisq")
+summary(ab)
+
+ac<- update(ab, . ~ . -meses_s_fol:d13C )
+anova(ab, ac, test="Chisq")
+summary(ac)
+
+ad<- update(ac, . ~ . -volume_raiz_ocupada:d13C )
+anova(ad, ac, test="Chisq")
+summary(ad)
+
+ae<- update(ad, . ~ . -meses_s_fol:diam_medio_copa )
+anova(ad, ae, test="Chisq")
+summary(ae)
+
+af<- update(ae, . ~ . -dh:d13C )
+anova(af, ae, test="Chisq")
+summary(af)
+
+ag<- update(af, . ~ . -dh  )
+anova(af, ag, test="Chisq")
+summary(ag)
+
+ah<- update(ag, . ~ . -dens_mad  )
+anova(ah, ag, test="Chisq")
+summary(ah)
+
+ai<- update(ah, . ~ . -das_m  )
+anova(ah, ai, test="Chisq")
+summary(ai)
+
+aj<- update(ai, . ~ . -meses_s_fol  )
+anova(aj, ai, test="Chisq")
+summary(aj)
+
+ak<- update(aj, . ~ . -SLA  )
+anova(aj, ak, test="Chisq")
+summary(ak)
+
+al<- update(ak, . ~ . -volume_raiz_ocupada)
+anova(al, ak, test="Chisq")
+summary(al)
+
+am<- update(al, . ~ . -CN )
+anova(al, am, test="Chisq")
+summary(am)
+anova(am, test="F")
+
+r.squaredGLMM(am)
+
+
+#Question2: Como a interação de atributos nurse-target influenciam seus outcomes?
+#traits nurses e rii
+#library(reshape2)
+#wmk<- wmknurse[,c(1,2,14,23,28,30,31,35,36,37,39,40,41,42)]
+#wmk <- melt(wmk, id.vars= c("plot", "spnurse", "dens_mad", "das_m","diam_medio_copa","dh","d13C","CN","SLA","meses_s_fol",
+#                     "volume_raiz_ocupada"), variable.name = "target", value.name = "rii")
+wmk<- read.csv("wmk.csv")
+
+wmk$plot <- as.factor(wmk$plot)
+#wmk <- as.matrix(wmk)
+
+##Análise glmm plot as Fixed factor - Pergunta 2
+
+wmkst <- wmk[,-c(1,2,12)]
+wmkst <- scale(wmkst, center=T, scale=T) # o R sugeriu reescalonar as variáveis preditodas porque elas estão em escalas muito diferentes
+wmkst <- cbind(wmkst, wmk[,c(1,2,12)])
+
+quest2 <- lmer(rii ~ dh:rsprop + meses_s_fol:rsprop +  d13C:rsprop  +  diam_medio_copa:rsprop +  volume_raiz_ocupada:rsprop + CN:rsprop + SLA:rsprop+  dh:sensdrought + meses_s_fol:sensdrought +  d13C:sensdrought  +  diam_medio_copa:sensdrought +  volume_raiz_ocupada:sensdrought+ CN:sensdrought+ SLA:sensdrought+ meses_s_fol:d13C:rsprop + volume_raiz_ocupada:meses_s_fol:rsprop + CN:d13C:rsprop + diam_medio_copa:meses_s_fol:rsprop  + meses_s_fol:d13C:sensdrought  + volume_raiz_ocupada:meses_s_fol:sensdrought  + CN:d13C:sensdrought + diam_medio_copa : meses_s_fol:sensdrought + (1|plot),  data=wmkst) 
+summary(quest2)
+
+q2<- update(quest2,. ~ . -rsprop:d13C:CN )
+anova(quest2, q2, test="Chisq")
+summary(q2)
+
+q3<- update(q2,. ~ . -rsprop:meses_s_fol:d13C )
+anova(q3, q2, test="Chisq")
+summary(q3)
+
+q4<- update(q3,. ~ . -meses_s_fol:d13C:sensdrought )
+anova(q3, q4, test="Chisq")
+summary(q4)
+
+q5<- update(q4,. ~ . -rsprop:meses_s_fol:volume_raiz_ocupada )
+anova(q5, q4, test="Chisq")
+summary(q5)
+
+q6<- update(q5,. ~ . -meses_s_fol:diam_medio_copa:sensdrought )
+anova(q5, q6, test="Chisq")
+summary(q6)
+
+q7<- update(q6,. ~ . -rsprop:meses_s_fol:diam_medio_copa)
+anova(q7, q6, test="Chisq")
+summary(q7)
+
+q8<- update(q7,. ~ . -meses_s_fol:volume_raiz_ocupada:sensdrought)
+anova(q7, q8, test="Chisq")
+summary(q8)
+
+q9<- update(q8,. ~ . -d13C:CN:sensdrought)
+anova(q9, q8, test="Chisq")
+summary(q9)
+
+q10<- update(q9,. ~ . -SLA:sensdrought)
+anova(q9, q10, test="Chisq")
+summary(q10)
+
+q11<- update(q10,. ~ . -rsprop:meses_s_fol)
+anova(q11, q10, test="Chisq")
+summary(q11)
+
+q12<- update(q11,. ~ . -dh:sensdrought)
+anova(q11, q12, test="Chisq")
+summary(q12)
+
+q13<- update(q12,. ~ . -sensdrought:meses_s_fol)
+anova(q13, q12, test="Chisq")
+summary(q13)
+
+q14<- update(q13,. ~ . -rsprop:diam_medio_copa)
+anova(q13, q14, test="Chisq")
+summary(q14)
+
+q15<- update(q14,. ~ . -sensdrought:diam_medio_copa)
+anova(q15, q14, test="Chisq")
+summary(q15)
+
+q16<- update(q15,. ~ . -CN:sensdrought)
+anova(q15, q16, test="Chisq")
+summary(q16)
+
+q17<- update(q16,. ~ . -volume_raiz_ocupada:sensdrought)
+anova(q17, q16, test="Chisq")
+summary(q17)
+r.squaredGLMM(q17)
+
+#Traits targets
+#Root:shoot proportion biomass
+angrs <- 5.4 
+arors <- 3.9  
+catrs <- 3.6
+wmk$rstarget <- rep(c(angrs, arors, catrs, each=60))
+
+#Drought sensitivity (difference between biomass in water and dry treatment - above and belowground sum)
+angd <- 5.54
+arod <- 4.86
+catd <- 3.43
+wmk$sensdrought <-rep(c(angd, arod, catd), each=60)
+
+#Crescimento máx raiz  água
+angroots <- 102.75
+aroroots <- 56
+catroots <- 115
+wmk$crescraiz<- rep(c(angroots, aroroots, catroots), each=60)
+
+#Crescimento máx aerea água
+angaer <- 18.4
+aroaer <- 13.8
+cataer <- 6.8
+wmk$crescaereo <- rep(c (angaer, aroaer, cataer),  each=60)

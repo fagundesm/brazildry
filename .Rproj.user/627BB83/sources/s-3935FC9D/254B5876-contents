@@ -1,0 +1,268 @@
+library(gridExtra)
+library(dplyr)
+library(ggplot2)
+
+sdErr <- function(x) sqrt(var(x,na.rm=TRUE)/length(na.omit(x)))
+
+#Traits Caatinga
+ad<- read.csv ("traits_adultas.csv")
+
+a<-ad%>% select(id.sci,altura_aerea_cm, diam_medio_copa, SLA, LA, t_dens, volume_raiz_ocupada,
+                dens_casca,t_capac_arm_lenho, thick_casca, t_capac_arm_casca, dh, d13C, CN, meses_s_fol, r_dens, SRA)
+
+idades <- read.csv("traits_idades2.csv")
+
+hst<- idades%>%
+  group_by(age, id.sci) %>%
+  summarise_all(funs(mean(., na.rm = TRUE)))
+
+#HISTOGRAMAS EM DENSIDADES E EM LAYERS
+#altura_aerea_cm, SLA, LA, t_dens, r_dens, SRA
+library(ggridges)
+library(ggplot2)
+t<- select(hst,altura_aerea_cm, id.sci,age)
+ggplot(t, aes(x = altura_aerea_cm, y =age , fill = age)) +
+  geom_density_ridges() +
+  theme_ridges() + 
+  theme(legend.position = "")+
+  xlab("Height cm")
+
+#HISTOGRAMAS EM DENSIDADES
+#altura_aerea_cm, SLA, LA, t_dens, r_dens, SRA
+# diam_medio_copa, volume_raiz_ocupada, dens_casca, t_capac_arm_lenho, thick_casca, t_capac_arm_casca, dh, d13C, CN, meses_s_fol
+
+ggplot(a, aes(meses_s_fol)) +
+  theme(axis.text.x = element_text( hjust = 1, size=16),
+        axis.text.y=element_text(size=16), 
+        axis.title=element_text(size=16), 
+        panel.background = element_rect(fill='white', colour='black'), 
+        axis.text=element_text(colour="black"),
+        legend.text=element_text(size=15))+
+  geom_density(alpha = 0.6, fill="lightblue") +
+xlab("Months withouth leaves") + ylab("Density")
+
+
+#HISTOGRAMAS EM LAYERS
+alt<- select(hst,r_dens )
+ggplot(alt, aes(x=r_dens, fill=idade)) +
+  theme(axis.text.x = element_text( hjust = 1, size=16),
+        axis.text.y=element_text(size=16), 
+        axis.title=element_text(size=16), 
+        panel.background = element_rect(fill='white', colour='black'), 
+        axis.text=element_text(colour="black"),
+        legend.text=element_text(size=15))+
+  xlab("Root Density g/cm³") + ylab("count")+
+  geom_histogram(alpha=0.5, position="identity",binwidth=0.05, color="black")+
+  facet_grid(idade ~ .)
+# +  scale_fill_manual(values = c("black", "grey", "lightgrey"))
+
+#HISTOGRAMAS SOBREPOSOTOS
+t<- select(hst,r_dens,id.sci )
+ggplot(t, aes(x=r_dens, fill=idade)) +
+  theme(axis.text.x = element_text( hjust = 1, size=16),
+        axis.text.y=element_text(size=16), 
+        axis.title=element_text(size=16), 
+        panel.background = element_rect(fill='white', colour='black'), 
+        axis.text=element_text(colour="black"),
+        legend.text=element_text(size=15))+
+  xlab("Root Density g/cm³)") + ylab("count")+
+  geom_histogram(alpha=0.9, position="identity",binwidth=0.05, color="black")
+
+
+
+head(diamonds)
+
+wd <- hist(adm$t_dens_mean, 
+           main="Wood density", 
+       xlab="Wood Density g/cm³", 
+       border="black", 
+       col="grey",
+       xlim=c(0,1),
+       ylim=c(0,8),
+       las=1, 
+       breaks=10)
+
+bd <- hist(adm$dens_casca_mean, 
+           main="Bark density", 
+           xlab="Bark Density g/cm³", 
+           border="black", 
+           col="grey",
+           xlim=c(0,1),
+           las=1, 
+           breaks=10)
+  
+ ws <- hist(adm$t_capac_arm_lenho_mean, 
+            main="Wood Storage Capacity", 
+            xlab="Wood Storage Capacity %", 
+            border="black", 
+            col="grey",
+            ylim=c(0,15),
+            xlim=c(0,2.5),
+            las=1, 
+            breaks=10)
+ 
+bsc <- hist(adm$t_capac_arm_casca_mean, 
+          main="Bark Storage Capacity", 
+          xlab="Bark Storage Capacity %", 
+          border="black", 
+          col="grey",
+          xlim=c(1,4),
+          las=1, 
+          breaks=10)
+ 
+ tm <- hist(adm$thick_casca_mean, 
+          main="Bark thickness", 
+          xlab="Bark thickness cm", 
+          border="black", 
+          col="grey",
+          xlim=c(0,5),
+          las=1, 
+          breaks=10)
+ 
+ das <- hist(adm$das_m_mean, 
+          main="Diameter at height soil", 
+          xlab="Diameter at height soil m ", 
+          border="black", 
+          col="grey",
+          xlim=c(0,2),
+          las=1, 
+          breaks=10)
+  
+h  <- hist(adm$altura_aerea_cm_mean, 
+          main="Tree Height", 
+          xlab="Height cm", 
+          border="black", 
+          col="grey",
+          #xlim=c(0,1),
+          las=1, 
+          breaks=10)
+  
+dcopa  <- hist(adm$diam_medio_copa_mean, 
+          main="Canopy diameter m", 
+          xlab="", 
+          border="black", 
+          col="grey",
+            xlim=c(0,20),
+          las=1, 
+          breaks=10)
+  
+dh<- hist(adm$dh_mean, 
+      main="Hydraulic Diameter", 
+      xlab="Hydraulic Diameter", 
+      border="black", 
+      col="grey",
+      # xlim=c(0,1),
+      las=1, 
+      breaks=10)
+ 
+ c13<- hist(adm$d13C_mean, 
+         main="ΔC13", 
+         xlab="ΔC13", 
+         border="black", 
+         col="grey",
+         # xlim=c(0,1),
+         las=1, d13C_mean 
+         breaks=13)
+ 
+cn <- hist(adm$CN_mean, 
+         main="C:N proportion", 
+         xlab="C:N proportion", 
+         border="black", 
+         col="grey",
+       xlim=c(10,40),
+         las=1, 
+         breaks=10)
+
+d15 <- hist(adm$d15N_mean, 
+         main="ΔN15", 
+         xlab="ΔN15", 
+         border="black", 
+         col="grey",
+          xlim=c(2,14),
+         las=1, 
+         breaks=10)
+ 
+mwl <- hist(adm$meses_s_fol_mean, 
+         main="Months Without Leaves", 
+         xlab="Months Without Leaves", 
+         border="black", 
+         col="grey",
+          xlim=c(0,10),
+         las=1, 
+         breaks=10)
+
+rdens <- hist(adm$r_dens_mean, 
+         main="Root density", 
+         xlab="Root density g/cm³", 
+         border="black", 
+         col="grey",
+         xlim=c(0,1),
+         las=1, 
+         breaks=5)
+ 
+la <- hist(adm$LA_mean, 
+         main="Leaf Area", 
+         xlab="Leaf Area mm²", 
+         border="black", 
+         col="grey",
+         # xlim=c(0,1),
+         las=1, 
+         breaks=10)
+
+sla <- hist(adm$SLA_mean, 
+           main="Specific Leaf Area", 
+           xlab="Specific Leaf Area m²/Kg", 
+           border="black", 
+           col="grey",
+           # xlim=c(0,1),
+           las=1, 
+           breaks=10)
+
+sra <- hist(adm$SRA_mean , 
+         main="Specific Root Area", 
+         xlab="Specific Root Area m²/Kg", 
+         border="black", 
+         col="grey",
+         #xlim=c(0,1),
+         las=1, 
+         breaks=10)
+ 
+ vraz<- hist(adm$volume_raiz_ocupada_mean, 
+         main="Root volume", 
+         xlab="Root volume per ground", 
+         border="black",
+         w=8,
+         col="grey",
+         #xlim=c(0,1),
+         las=1, 
+         breaks=10)
+ 
+
+ #Traits try somente de árvores do semiarido do mundo proposto por Bastin 2017 (pasta 'points inside a shape')
+ t <- read.csv('try.semiarid.csv')
+ t <- t [, -c(1,2,3,5,39,40)]
+ str(t)
+ 
+ sp.id <- t$ObservationID
+ id <-as.vector(t$AccSpeciesName)
+ SRA <- (t$Absorptive.fine.root.surface.area.per.absorptive.fine.root.dry.mass..specific.absorptive.fine.root.area./10) #Try= cm2 g-1 to  Caat= m²/kg
+ t_dens <- t$Stem.dry.mass.per.stem.fresh.volume..stem.specific.density..SSD..wood.density # try= mg/mm3 to Caat= g/cm³ IS THE SAME
+ altura_aerea_cm <- (t$Plant.height.vegetative*100) #try mm to caat cm
+ diam_medio_copa <- t$Crown..canopy..length..diameter.along.the.longest.axis #m ok
+ dh <- (t$Wood.vessel.diameter^(1/4))    #multiplicar o TRY  por diam_vaso^4 já está em mm 
+ t_capac_arm_lenho <- (t$Sapwood.water.storage.capacity.*1000) # try kg m-3 MPa-1 to g
+ LA <- (t$Leaf.area..in.case.of.compound.leaves..leaf..petiole.excluded./100) # try mm2 to caat cm² 
+ SLA <- t$Leaf.area.per.leaf.dry.mass..SLA.or.1.LMA...petiole.and.rachis.excluded #CUIDAR porque a raque foi excluida mm2 mg-1 (mesma relação?) 
+ r_dens <- t$Root.tissue.density..root.dry.mass.per.root.volume. #g/cm3 try= mg/mm3 to Caat= g/cm³ IS THE SAME
+ d13C <- t$Leaf.carbon..C..isotope.signature..delta.13C. 
+ CN <- t$Leaf.carbon.nitrogen..C.N..ratio  
+ t_capac_arm_casca <- (t$Sapwood.water.storage.capacity.*1000) # try kg m-3 MPa-1 to g #kg m-3 MPa-1
+ thick_casca <- t$Bark.thickness #mm
+ peso_seco_SLA <-t$Leaf.dry.mass #DIVIDIR A CAATINGA POR 3  
+ tipo <- rep("world", 2229)
+ 
+ tryf<-as.data.frame( cbind(sp.id,id, SRA, t_dens, altura_aerea_cm, diam_medio_copa, dh, t_capac_arm_lenho, LA, SLA, r_dens, d13C, CN, 
+                            t_capac_arm_casca, thick_casca, peso_seco_SLA, tipo))
+ 
+ summary(tryf)
+ 

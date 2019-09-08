@@ -1,0 +1,80 @@
+### ANALISE DE COVARIANCIA
+#PROF. CARLOS ROBERTO FONSECA
+
+#VARIAVEL DEPENDENTE CONTINUA
+#VARIAVEL EXPLANATORIA MISTURADA (CONTINUA X1 E CATEGORICA X2) E )
+
+#H0: X1 NAO AFETA Y
+#H1: X1 AFETA Y
+
+#H0: X2 NAO AFETA Y
+#H1: X2 NAO AFETA Y
+
+#HO: NAO HA INTERACAO ENTRE X1 E X2 NA DEFINICAO DE Y
+#H1: HA INTERACAO ENTRE X1 E X2 NA DEFICICAO DE Y
+
+
+#ANCOVA TIPO I
+#NESTE TIPO, AS VARI?VEIS S?O TESTADAS NA SEQUENCIA QUE APARECEM NO MODELO
+#AQUI, CONTROLA-SE PELA COVARIANTE E TESTA-SE O FATOR
+#NESTE EXEMPLO, QUEREMOS CONTROLAR PELO TAMANHO DO CORPO PARA TESTAR A DIFERENCA ENTRE SEXO
+
+#DADOS - SELECAO SEXUAL
+corpo <- rnorm(30,100,30)
+sexo <- as.factor(rep(c("Macho","Femea"),e=15))
+chifre <- c((corpo[1:15]*5+rnorm(15)*10),(corpo[16:30]*2+rnorm(15)*10))
+data <- data.frame(corpo,sexo,chifre)
+data
+
+#GRAFICO
+par(mfrow=c(1,1))
+plot(chifre~corpo, ylab= "Tamanho do chifre (mm)", xlab="Tamanho do corpo (cm)")
+abline(lm(chifre[1:15]~corpo[1:15]), col="black", lwd=2)
+abline(lm(chifre[16:30]~corpo[16:30]), col="grey", lwd=2)
+
+#ANCOVA TIPO I
+mod.ancova<-lm(chifre~corpo*sexo)
+summary(mod.ancova)
+anova(mod.ancova)
+par(mfrow=c(2,2))
+plot(mod.ancova)
+
+#COMO E CALCULADO?
+mod_cc <- lm(chifre~corpo)
+anova(mod_cc)
+res_cc <- resid(lm(chifre~corpo))
+mod_sexo <- lm(res_cc~corpo*sexo)
+anova(mod_sexo)
+
+
+
+### ANCOVA TIPO 3 
+#NESTE TIPO, A ORDEM DE ENTRADA N?O ALTERA O RESULTADO
+#O EFEITO DE UMA VARIAVEL E TESTADA APOS SE CONTROLAR PELA(S) OUTRA(S)
+#NESTE EXEMPLO, QUEREMOS VER O EFEITO DA ?REA CONTROLANDO PELO TAMANHO
+#E DO TAMANHO CONTROLANDO PELA AREA
+
+#DADOS - BIOGEOGRAFIA DE ILHA
+tamanho <- rnorm(30,100,30)
+isolamento <- as.factor(rep(c("Perto","Longe"),e=15))
+riqueza <- c((tamanho[1:15]*6+rnorm(15)*20),(tamanho[16:30]*3+rnorm(15)*20))
+data2 <- data.frame(tamanho,isolamento,riqueza)
+data2
+
+#GRAFICO
+par(mfrow=c(1,1))
+plot(riqueza~tamanho, ylab="Riqueza de esp?cies", xlab="Tamanho da ilha (km2)")
+abline(lm(riqueza[1:15]~tamanho[1:15]), col="black", lwd=2)
+abline(lm(riqueza[16:30]~tamanho[16:30]),col="grey",lwd=2)
+
+#ANCOVA TIPO III
+library(car)	# carregar o pacote "car"
+op<-options(contrasts=c("contr.sum", "contr.poly"))  	# Para mudar os contrastes do c?culo dos coeficientes para "contr.sum", o default do R ? o "contr.treatment"
+mod_ancova <- lm(riqueza~tamanho*isolamento)
+Anova(mod_ancova, type="III")[-1,] #ANOVA COM MAIUSCULA
+
+#PARA CALCULAR A SOMA DOS QUADRADOS DA INTERACAO
+#DIFEREN?A ENTRE MODELO ADITIVO E MODELO COM INTERA??O
+mod1 <- lm(riqueza~tamanho*isolamento)
+mod2 <- lm(riqueza~tamanho+isolamento)
+anova (mod1,mod2)

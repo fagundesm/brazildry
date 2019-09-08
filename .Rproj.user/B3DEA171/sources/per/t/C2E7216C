@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1549372826837.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2261729502",
+    "id" : "C2E7216C",
+    "lastKnownWriteTime" : 1549457254,
+    "last_content_update" : 1549457254475,
+    "path" : "~/Dropbox/brazildry/CWM_production.R",
+    "project_path" : "CWM_production.R",
+    "properties" : {
+        "cursorPosition" : "73,2",
+        "scrollLine" : "62",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

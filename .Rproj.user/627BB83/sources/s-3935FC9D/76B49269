@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1560182815353.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "76B49269",
+    "lastKnownWriteTime" : 1562696012,
+    "last_content_update" : 1562699646932,
+    "path" : "~/Dropbox/brazildry/chap3.R",
+    "project_path" : "chap3.R",
+    "properties" : {
+        "cursorPosition" : "99,0",
+        "scrollLine" : "92",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

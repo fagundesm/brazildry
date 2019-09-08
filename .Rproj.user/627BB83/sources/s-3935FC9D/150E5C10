@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1562262251606.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "150E5C10",
+    "lastKnownWriteTime" : 1562695713,
+    "last_content_update" : 1562695713360,
+    "path" : "~/Dropbox/brazildry/chap3_graph.R",
+    "project_path" : "chap3_graph.R",
+    "properties" : {
+        "cursorPosition" : "50,0",
+        "scrollLine" : "43",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

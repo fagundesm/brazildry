@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1549392084633.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "A0400550",
+    "lastKnownWriteTime" : 0,
+    "last_content_update" : 1549392084633,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "9C7F3A04",
+        "caption" : "cwm",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=cwm&cache_key=9C7F3A04",
+        "displayedObservations" : 147,
+        "environment" : "",
+        "object" : "cwm",
+        "preview" : 0,
+        "totalObservations" : 147,
+        "variables" : 13
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

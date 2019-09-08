@@ -1,0 +1,23 @@
+install.packages("devtools")
+devtools::install_github("hohenstein/remef")
+
+#To remove the influece of x2 and the random effects from the dependent variable, you can use
+
+library(remef)
+y_partial <- remef(model, fix = "x2", ran = "all")
+#This will create a modified version of y based on the partial effect while the residuals are still present. Hence, you can still visualize the deviations from the predictions.
+
+#With the adjusted data y_partial you can, for example, create a plot of y_partial as a function of x1 together with a linear regression line.
+
+#OR
+
+#removing the effect of x2 and r on y
+res.y<-residuals(lmer(y~x2+(1|r),data)) 
+
+#removing the effect of x2 and r on x1
+res.x1<-residuals(lmer(x1~x2+(1|r),data)) 
+
+#partial regression plot to display the pure effect of x1 on y
+plot(res.x1,res.y)
+
+rii ~ dh + rsprop + d13C + volume_raiz_ocupada + CN + SLA 

@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1562693724338.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "DF6D8D11",
+    "lastKnownWriteTime" : 1562693693,
+    "last_content_update" : 1562693724338,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "2363BCF7",
+        "caption" : "spbiom",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=spbiom&cache_key=2363BCF7",
+        "displayedObservations" : "80",
+        "environment" : "",
+        "object" : "spbiom",
+        "preview" : "0",
+        "totalObservations" : "80",
+        "variables" : "4"
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

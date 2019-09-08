@@ -1,0 +1,172 @@
+# 1. A média de atributos influencia a produçãode biomassa das parcelas? Y=biomassa, X=CWM
+
+#CWM - Média simples de atributos por comunidade. Não precisa ponderar pela média porque as espécies tem abundancia equivalente.
+#Aqui tem como utilizar as monoculturas também. na outra pergunta nao tem como.
+library(dplyr)
+#traits <- read.csv("data/traits_BD.csv")
+#traits <- select(traits, id.sci, id, altura_aerea_cm, comp_raiz_cm,SLA, LA, t_capac_arm_lenho, t_capac_arm_casca, t_dens, r_capac_arm_casca,
+#                 r_capac_arm_lenho, r_dens, SRA )
+
+cm <- read.csv("data/CWM_plots.csv")
+
+cmw <- cm[,-3] %>% group_by(plot, div) %>% 
+  summarise_all(funs(mean(., na.rm = TRUE)))
+
+cwm <- as.data.frame(cmw)
+
+cres <- read.csv("data/BDcrescimento_por_plot.csv")
+
+arrange(cwm, plot, div); arrange(cres, plot, div)
+
+cres$plot == cwm$plot
+
+q1 <- cbind(cwm,cres)
+q1 <- q1[,-c(14,15)]
+
+#Regressão múltipla  | Variáveis correlacionadas já removidas
+library(mgcv)
+q2 <- select(q1, plot, div, comp, cresc.biomassa , SLA, LA, altura_aerea_cm,  t_dens, t_capac_arm_casca, 
+             r_capac_arm_casca, comp_raiz_cm,  r_dens, SRA)
+
+q2$cresc.biomassa <- (q2$cresc.biomassa+8)
+
+
+library(psych)
+pairs.panels(q2[4:13])
+
+
+
+#q3 <- scale(q2[,-c(1,2,3)]) NAO DÁ CERTO
+#q3<- cbind(q2[,c(1,2,3)], q3)
+
+par(mfrow=c(2,2))
+
+hist(log10(q2$cresc.biomassa))
+hist((log10(q2$t_capac_arm_casca)))
+
+#q2$SLA <- (sqrt(q2$SLA))
+#q2$altura_aerea_cm <- log(q2$altura_aerea_cm)
+#q2$t_dens <- ((q2$t_dens)^2)
+#q2$t_capac_arm_casca<- (log(q2$t_capac_arm_casca))
+#q2$r_capac_arm_casca<- (log(q2$r_capac_arm_casca))
+q2$div<- as.factor(q2$div)
+q2$cresc.biomassa <-(log(q2$cresc.biomassa))
+
+CWM <- glm(cresc.biomassa ~ SLA + altura_aerea_cm +  t_dens + t_capac_arm_casca + LA +
+             r_capac_arm_casca  + comp_raiz_cm +  r_dens + SRA +  div + comp, family = "gaussian", data=q2)
+
+plot(CWM)
+
+anova(CWM, test="F")
+summary(CWM)
+
+par(mfrow=c(2,2))
+plot(CWM)
+
+CWM2 <- glm(cresc.biomassa ~ SLA + altura_aerea_cm +  t_dens + t_capac_arm_casca + LA +
+            r_capac_arm_casca  + comp_raiz_cm +  r_dens  +  div + comp ,   family = "gaussian",data=q2)
+
+anova(CWM2, test="F")
+summary(CWM2)
+
+anova(CWM, CWM2, test="Chisq")
+
+library(glmm)
+
+glmm (cresc.biomassa ~ SLA + altura_aerea_cm +  t_dens + t_capac_arm_casca + LA +
+       r_capac_arm_casca  + comp_raiz_cm +  r_dens + random (comp), family= "gaussian", data=q2 )
+
+####crescimento geral 
+
+cres<- read.csv("data/BDcrescimento_por_individuo.csv")
+
+glm()
+
+
+
+library(ggplot2)
+ggplot(q2, aes(y=cresc.biomassa, x=altura_aerea_cm))+
+  geom_point(aes(colour=div),size=4,show.legend = T)+
+  geom_smooth(method="loess")+
+  xlab("species height")+
+  ylab("biomass production (g)")+
+  theme(axis.text.x = element_text(size=16, colour="black"),
+        axis.title = element_text(size=20),
+        axis.text.y = element_text(size=16,colour="black"),
+        panel.background = element_rect(fill='white', colour='black'))
+
+ggplot(q2, aes(y=cresc.biomassa, x=comp_raiz_cm))+
+  geom_point(aes(colour=div),size=4,show.legend = T)+
+  geom_smooth(method="auto")+
+  xlab("root depth")+
+  ylab("biomass production (g)")+
+  theme(axis.text.x = element_text(size=16, colour="black"),
+        axis.title = element_text(size=20),
+        axis.text.y = element_text(size=16,colour="black"),
+        panel.background = element_rect(fill='white', colour='black'))
+
+ggplot(q2, aes(y=cresc.biomassa, x=r_dens))+
+  geom_point(aes(colour=div),size=4,show.legend = T)+
+  geom_smooth(method="auto")+
+  xlab("Trunk wood density(g/cm³)")+
+  ylab("biomass production (g)")+
+  theme(axis.text.x = element_text(size=16, colour="black"),
+        axis.title = element_text(size=20),
+        axis.text.y = element_text(size=16,colour="black"),
+        panel.background = element_rect(fill='white', colour='black'))
+
+ggplot(q2, aes(y=cresc.biomassa, x=t_dens))+
+  geom_point(aes(colour=div),size=4,show.legend = T)+
+  geom_smooth(method="auto")+
+  xlab("Wood density (g/cm³)")+
+  ylab("Biomass production (g)")+
+  theme(axis.text.x = element_text(size=16, colour="black"),
+        axis.title = element_text(size=20),
+        axis.text.y = element_text(size=16,colour="black"),
+        panel.background = element_rect(fill='white', colour='black'))
+
+ggplot(q2, aes(y=cresc.biomassa, x=r_capac_arm_casca))+
+  geom_point(size=4,show.legend = FALSE)+
+  geom_smooth(method="auto")+
+  xlab("Bark root storage capacity (g)")+
+  ylab("biomass production (g)")+
+  theme(axis.text.x = element_text(size=16, colour="black"),
+        axis.title = element_text(size=20),
+        axis.text.y = element_text(size=16,colour="black"),
+        panel.background = element_rect(fill='white', colour='black'))
+
+ggplot(q1, aes(y=cresc.biomassa, x=comp_raiz_cm))+
+  geom_point(size=4,show.legend = FALSE)+
+  geom_smooth(method="auto")+
+  xlab("Root depth (m)")+
+  ylab("biomass production (g)")+
+  theme(axis.text.x = element_text(size=16, colour="black"),
+        axis.title = element_text(size=20),
+        axis.text.y = element_text(size=16,colour="black"),
+        panel.background = element_rect(fill='white', colour='black'))
+
+
+#SObrvivvência
+library(dplyr)
+scm <- read.csv("data/CWM_plots.csv")
+
+scmw <- scm[,-3] %>% group_by(plot, div) %>% 
+  summarise_all(funs(mean(., na.rm = TRUE)))
+
+scwm <- as.data.frame(scmw)
+
+sob <- read.csv("data/sobrev_por_parcela.csv")
+sob <- filter(sob, div != "ctrl")
+sob <- as.data.frame(sob)
+
+arrange(scwm, plot, div); arrange(sob, plot, div)
+
+sob$plot == scwm$plot
+
+s1 <- cbind(scwm,sob)
+s1 <- s1[,-c(14,15)]
+
+sCWM <- gam(sob_porc_parcela ~ s(SLA) + s(altura_aerea_cm) +  s(t_dens) + s(t_capac_arm_casca) + 
+             s(r_capac_arm_casca)  + s(comp_raiz_cm) +  s(r_dens) + s(SRA) + s(comp, bs="re")+ s(div, bs="re"), data=s1)
+
+summary.gam(sCWM)

@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1562695622917.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "D8D2A19",
+    "lastKnownWriteTime" : 1562694948,
+    "last_content_update" : 1562695622917,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "C148BF35",
+        "caption" : "bioma",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=bioma&cache_key=C148BF35",
+        "displayedObservations" : 5,
+        "environment" : "",
+        "object" : "bioma",
+        "preview" : 0,
+        "totalObservations" : 5,
+        "variables" : 4
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

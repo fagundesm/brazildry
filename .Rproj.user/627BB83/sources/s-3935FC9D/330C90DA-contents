@@ -1,0 +1,155 @@
+wmknurse <- read.csv("whatmakesnurse.csv")
+library(ggplot2)
+library(dplyr)
+library(gridExtra)
+
+#Grafico Seleção de modelos para ANGICO dh
+a <- ggplot(wmknurse, aes(y=cating, x=volume_raiz_ocupada))+
+  geom_point(size=4,show.legend = FALSE)+
+  geom_smooth(method=lm)+
+  xlab("Root volume")+
+  ylab("Relative interaction intensity")+
+  theme(axis.text.x = element_text(size=16, colour="black"),
+        axis.title = element_text(size=20),
+        axis.text.y = element_text(size=16,colour="black"),
+        panel.background = element_rect(fill='white', colour='black'))
+
+#Grafico Seleção de modelos para ANGICO dh
+b<- ggplot(wmknurse, aes(y=cating, x=d13C))+
+  geom_point(size=4,show.legend = FALSE)+
+  geom_smooth(method=lm)+
+  xlab("Nurse ∂C13")+
+  ylab("Relative interaction intensity")+
+  theme(axis.text.x = element_text(size=16, colour="black"),
+        axis.title = element_text(size=20),
+        axis.text.y = element_text(size=16,colour="black"),
+        panel.background = element_rect(fill='white', colour='black'))
+
+grid.arrange(a,b)
+
+#Grafico Seleção de modelos para aroeira meses sem folha
+c<- ggplot(wmknurse, aes(y=cating, x=CN))+
+  geom_point(size=4,show.legend = FALSE)+
+  geom_smooth(method=lm)+
+  xlab("Nurse C:N")+
+  ylab("Relative interaction intensity")+
+  theme(axis.text.x = element_text(size=16, colour="black"),
+        axis.title = element_text(size=20),
+        axis.text.y = element_text(size=16,colour="black"),
+        panel.background = element_rect(fill='white', colour='black'))
+
+#Grafico Seleção de modelos para aroeira meses sem folha
+d<- ggplot(wmknurse, aes(y=aroeira, x=d13C))+
+  geom_point(size=4,show.legend = FALSE)+
+  geom_smooth(method=lm)+
+  xlab("Nurse ∆C13")+
+  ylab("Relative interaction intensity")+
+  theme(axis.text.x = element_text(size=16, colour="black"),
+        axis.title = element_text(size=20),
+        axis.text.y = element_text(size=16,colour="black"),
+        panel.background = element_rect(fill='white', colour='black'))
+
+grid.arrange(c,d)
+
+
+#Grafico Seleção de modelos para Catingueira meses sem folha
+ggplot(wmknurse, aes(y=cating, x=d13C))+
+  geom_point(size=4,show.legend = FALSE)+
+  geom_smooth(method=lm)+
+  xlab("Nurse ∆C13")+
+  ylab("Relative interaction intensity")+
+  theme(axis.text.x = element_text(size=16, colour="black"),
+        axis.title = element_text(size=20),
+        axis.text.y = element_text(size=16,colour="black"),
+        panel.background = element_rect(fill='white', colour='black'))
+
+
+#  Target root:shoot ratio | Nurse SLA e dh
+wmk <- read.csv("paper_traits/wmk.csv")
+
+#Figura 4  Y=rii, x= SLA em níveis de R:S
+
+  #SLA
+  sens4<- filter(wmk, target =="angico")
+  ggplot(sens4, aes(y=rii, x=SLA))+
+    geom_point(size=4,show.legend = FALSE)+
+    scale_y_continuous(limits = c(-.8, 0.8), breaks=seq(-.8, 0.8, by=0.2))+
+    geom_smooth(method=lm)+
+    xlab("SLA")+
+    ylab("Relative interaction intensity")+
+    theme(axis.text.x = element_text(size=20, colour="black"),
+          axis.title = element_text(size=20),
+          axis.text.y = element_text(size=20,colour="black"),
+          panel.background = element_rect(fill='white', colour='black'))+
+    ggtitle(label = "A. colubrina")
+  
+  sens5<- filter(wmk, target =="aroeira")
+  ggplot(sens5, aes(y=rii, x=SLA))+
+    geom_point(size=4,show.legend = FALSE)+
+    scale_y_continuous(limits = c(-.8, 0.8), breaks=seq(-.8, 0.8, by=0.2))+
+    geom_smooth(method=lm)+
+    xlab("SLA")+
+    ylab("Relative interaction intensity")+
+    theme(axis.text.x = element_text(size=20, colour="black"),
+          axis.title = element_text(size=20),
+          axis.text.y = element_text(size=20,colour="black"),
+          panel.background = element_rect(fill='white', colour='black'))+
+    ggtitle(label = "M. urundeuva")
+  
+  sens6<- filter(wmk, target =="cating")
+  ggplot(sens6, aes(y=rii, x=SLA))+
+    geom_point(size=4,show.legend = FALSE)+
+    scale_y_continuous(limits = c(-.8, 0.8), breaks=seq(-.8, 0.8, by=0.2))+
+    geom_smooth(method=lm)+
+    xlab("SLA")+
+    ylab("Relative interaction intensity")+
+    theme(axis.text.x = element_text(size=20, colour="black"),
+          axis.title = element_text(size=20),
+          axis.text.y = element_text(size=20,colour="black"),
+          panel.background = element_rect(fill='white', colour='black'))+
+    ggtitle(label = "P. pyramidallis")
+  
+  
+  #Nurse hd Target drought sens.
+  
+  sens7<- filter(wmk, target =="angico")
+    ggplot(wmk, aes(y=rii, x=d13C, colour = factor(target)))+
+    geom_point(size=4,show.legend = FALSE)+
+    scale_y_continuous(limits = c(-.8, 0.8), breaks=seq(-.8, 0.8, by=0.2))+
+    geom_smooth(method=lm)+
+    xlab("C:N")+
+    ylab("Relative interaction intensity")+
+    theme(axis.text.x = element_text(size=20, colour="black"),
+          axis.title = element_text(size=20),
+          axis.text.y = element_text(size=20,colour="black"),
+          panel.background = element_rect(fill='white', colour='black'))+
+    ggtitle(label = "A. colubrina")
+  
+  sens8<- filter(wmk, target =="aroeira")
+  ggplot(sens8, aes(y=rii, x=CN))+
+    geom_point(size=4,show.legend = FALSE)+
+    scale_y_continuous(limits = c(-.8, 0.8), breaks=seq(-.8, 0.8, by=0.2))+
+    geom_smooth(method=lm)+
+    xlab("C:N")+
+    ylab("Relative interaction intensity")+
+    theme(axis.text.x = element_text(size=20, colour="black"),
+          axis.title = element_text(size=20),
+          axis.text.y = element_text(size=20,colour="black"),
+          panel.background = element_rect(fill='white', colour='black'))+
+    ggtitle(label = "M. urundeuva")
+  
+  sens9<- filter(wmk, target =="cating")
+  ggplot(sens9, aes(y=rii, x=CN))+
+    geom_point(size=4,show.legend = FALSE)+
+    scale_y_continuous(limits = c(-.8, 0.8), breaks=seq(-.8, 0.8, by=0.2))+
+    geom_smooth(method=lm)+
+    xlab("C:N")+
+    ylab("Relative interaction intensity")+
+    theme(axis.text.x = element_text(size=20, colour="black"),
+          axis.title = element_text(size=20),
+          axis.text.y = element_text(size=20,colour="black"),
+          panel.background = element_rect(fill='white', colour='black'))+
+    ggtitle(label = "P. pyramidallis")
+  
+  
+  
