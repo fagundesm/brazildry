@@ -117,26 +117,28 @@ ggplot(bioma2, aes(y=se, x=SR, fill=factor(COMP)))+
 
 
 #Qual espécie tem a maior produção de biomassa?
-s<- read.csv("data/BDcrescimento_por_sp_por_plot.csv")
-smo<- filter(s, div=="1")
+s <- read.csv("data/BDcrescimento_por_sp_por_plot.csv")
+library(ggplot2)
 s$div <- as.factor(s$div)
 
-spbiom<- summarise(group_by(s, especie, div),
-                   cb=mean(cresc.biomassa, na.rm=T),
-                   scb=sdErr(cresc.biomassa))
-smo<- filter(spbiom, div=="4")
+spbiom <- summarise(group_by(s, div, especie),
+                    cb=mean(cresc.biomassa, na.rm=T),
+                    scb=se(cresc.biomassa))
 
-ggplot(smo, aes(y=cb, x= reorder(cb,especie), fill=factor(especie)))+
-    theme(axis.text.x = element_text( hjust = 1, size=20, angle=90),
-          axis.text.y=element_text(size=20), 
-          axis.title=element_text(size=20), 
+spbioma <- filter(spbiom, div=="16")
+
+ggplot(spbioma, aes(y=cb, x= especie))+
+    theme(axis.text.x = element_text(size=20, angle=90),
+          axis.text.y=element_text(size=16), 
+          axis.title=element_text(size=16), 
           panel.background = element_rect(fill='white', colour='black'), 
           axis.text=element_text(colour="black"),
           legend.text=element_text(size=16))+
       geom_bar(stat="identity",position="dodge", alpha = 0.6)+
-  ylab("Relative biomass growth (g)")  +  xlab("Species diversity 16")+ 
+  ylab("Relative biomass growth (g)")  +  xlab("Species")+ 
+  ggtitle("Species diversity 16")+
   geom_errorbar(aes(ymin=cb - scb, ymax= cb+ scb), width=.5,
-                position=position_dodge(.5))
+                position=position_dodge(.5))+
+  scale_x_discrete(labels = c('C.vit','A.col','S.mac',"P.pyr", "A.cea", "C.has","P.mar", "C.lept","H.imp", "Z.joa","P.sti","M.ten","L.fer","C.lepr","A.pyr"))
 
-geom_point(data=chp, aes(y=cresc.biomassa, x=DIV))
 

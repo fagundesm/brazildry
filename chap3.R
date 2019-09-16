@@ -57,26 +57,27 @@ summ(modb)
 library(bestNormalize)
 
 y<- bestNormalize(chp2$NBE)
-x1<- bestNormalize(chp2$PD)
-
+FD<- bestNormalize(chp2$PD)
 
 chp2$NBE <- chp2$NBE + 5
 as.factor(chp$SR)
-modc <- lmer(y$x.t ~  x1$x.t +  SR + (1|COMP), data=chp2)
+modc <- lmer(y$x.t ~  FD$x.t +  SR + (1|COMP), data=chp2)
 plot(modc)
 summary(modc)
 
 #Destrinchar os mecanismos de CE e SE na montagem de comunidades
 chp2$CE <- chp2$CE +10 
-modd<- lmer(log(CE) ~ log(PD)  +  SR + (1|COMP), data=chp2)
+ya<- bestNormalize(chp2$CE)
+
+modd<- lmer(ya$x.t ~ log(PD)  +  SR + (1|COMP), data=chp2)
 summary(modd)
 plot(modd)
-summ(modd)
 
 #ver se o selection effect é afetado (diminuido) se a DF ou NO da comunidade for menor
 chp2$SE <- chp2$SE + 224.4985
+yb<- bestNormalize(chp2$SE)
 
-mode <- lmer(SE ~ log(PD)  +  SR + (1|COMP), data=chp2)
+mode <- lmer(yb$x.t ~ log(PD)  +  SR + (1|COMP), data=chp2)
 plot(mode)
 summary(mode)     
 summ(mode)
@@ -97,22 +98,18 @@ plot(chp$cresc.biomassa ~ chp$div)
 r2(modb)
 
 #Qual espécie tem a maior produção de biomassa?
-s<- read.csv("data/BDcrescimento_por_sp_por_plot.csv")
+se <- function(x) sqrt(var(x,na.rm=TRUE)/length(na.omit(x)))
 
-spbiom<- summarise(group_by(s, especie, div),
-          cb=mean(cresc.biomassa, na.rm=T),
-          scb=sdErr(cresc.biomassa))
+s <- read.csv("data/BDcrescimento_por_sp_por_plot.csv")
 
-spbiom2<- summarise(group_by(s, div),
-                   cb=mean(cresc.biomassa, na.rm=T),
-                   scb=sdErr(cresc.biomassa))
+s$div <- as.factor(s$div)
+s$plot <- as.factor (s$plot)
 
-smo<- filter(spbiom, div=="2")
+creb<- bestNormalize(s$cresc.biomassa)
+hist(creb$x.t)
 
-summary(aov(cresc.biomassa ~ especie*div + Error(plot) , s))
-
-
-
+anovabio<- aov(creb$x.t ~ especie * div, data=s)
+summary(anovabio)
 
 
 
