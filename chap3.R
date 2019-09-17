@@ -1,5 +1,9 @@
 # 1. A sobreposição de atributos funcionais e a diversidade funcional influencia o overyield? Y=overyield, X=sobreposição.
 library(dplyr)
+library(lme4)
+library(lmerTest)
+library(jtools)
+
 setwd("~/Dropbox/brazildry")
 
 biom <- read.csv("data/BDcrescimento_por_plot.csv")
@@ -24,7 +28,15 @@ chp <- cbind(no, biom[,-c(1,2)], fd[,-3])
 summary(chp)
 chp <- as.data.frame(chp)
 
-#
+c <- read.csv("data/CWM_plots.csv")
+cmw <- c[,-3] %>% group_by(plot, div) %>% 
+  summarise_all(funs(mean(., na.rm = TRUE)))%>%
+  arrange(plot, div)
+bm <- biom%>%
+  arrange(plot, div)
+cwm_b <- cbind(bm,cmw[,-c(1,2)], chp[,c(1,3,8)])
+
+
 f<- fd %>% filter( SR != "1")
 n<- no %>% filter( DIV != "1")
 chp2 <- cbind(f, n[,-c(1,2)], oy[,-1])
@@ -35,23 +47,34 @@ chp2 <- cbind(f, n[,-c(1,2)], oy[,-1])
 # SE = Sampling effect (Loreau & Hector 2001)
 # FD = Functional diversity (Patchey & Gaston)
 # SR = Species richness
-library(lme4)
-library(lmerTest)
-library(jtools)
+
+
+#1 A produtividade é explicada por efeitos de complementariedade, diversidade ou CWM?
+#glmm cwm biomassa
+cm2<- scale(cwm_b[,-c(1,2,3,4,5,17,18)])
+cor(cm2)
+
+cwm_ana<- cbind(cwm_b[,c(1,2,3,4,5,17,18)], cm2)
+cwm_b$div <- as.factor(cwm_b$div)
+cwm_b$plot <- as.factor(cwm_b$plot)
+
+biom_rand <- lmer(cresc.biomassa ~ SLA + LA + altura_aerea_cm + t_dens+ r_dens + SRA + div + PD + (1|COMP), data=cwm_ana)
+summary(biom_rand)
+
+#1 A NBE é explicada por efeitos de complementariedade, diversidade ou CWM?
+#glmm cwm biomassa
+cmmb<- filter(cwm_b, div !="1")
+NBE <- cbind(chp2, cmmb[,-c(1,2)])
+NBE_ana<- select(NBE, plot, div, SLA, LA, altura_aerea_cm, t_dens, r_dens, SRA)
+
+
 
 #Testando quais plots tem NBE diferente de zero
 nbe <- chp2%>%
-    select(SR, COMP, NBE,CE,SE) 
+  select(SR, COMP, NBE,CE,SE) 
 b <- select(nbe, CE)
 t.test(b)
 
-#1 A produtividade é explicada por efeitos de complementariedade?
-str(chp)
-chp$cresc.biomassa <- chp$cresc.biomassa + 1
-modb <- glm(log(cresc.biomassa) ~  PD +  DIV + COMP , data=chp)
-summary(modb)
-plot(modb)
-summ(modb)
 
 #discutir o efeito liquido do NBE
 library(bestNormalize)
@@ -83,6 +106,8 @@ summary(mode)
 summ(mode)
 
 plot(chp2$SE, chp2$CE)
+
+
 
 
 # 1 Descrição da biomassa geral 
